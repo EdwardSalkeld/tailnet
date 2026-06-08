@@ -57,9 +57,11 @@ type deviceConfig struct {
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
+		var policyResource *tailscale.Acl
+
 		policy, err := os.ReadFile("policy.hujson")
 		if err == nil {
-			_, err = tailscale.NewAcl(ctx, "policy", &tailscale.AclArgs{
+			policyResource, err = tailscale.NewAcl(ctx, "policy", &tailscale.AclArgs{
 				Acl:               pulumi.String(string(policy)),
 				ResetAclOnDestroy: pulumi.Bool(false),
 			}, pulumi.Protect(true))
@@ -85,6 +87,11 @@ func main() {
 		}
 
 		for _, device := range devices {
+			deviceTagOptions := []pulumi.ResourceOption{pulumi.Protect(true)}
+			if policyResource != nil {
+				deviceTagOptions = append(deviceTagOptions, pulumi.DependsOn([]pulumi.Resource{policyResource}))
+			}
+
 			_, err = tailscale.NewDeviceKey(ctx, "device-key-"+device.Name, &tailscale.DeviceKeyArgs{
 				DeviceId:          pulumi.String(device.DeviceID),
 				KeyExpiryDisabled: pulumi.Bool(device.KeyExpiryDisabled),
@@ -96,7 +103,7 @@ func main() {
 			_, err = tailscale.NewDeviceTags(ctx, "device-tags-"+device.Name, &tailscale.DeviceTagsArgs{
 				DeviceId: pulumi.String(device.DeviceID),
 				Tags:     toStringArray(device.Tags),
-			}, pulumi.Protect(true))
+			}, deviceTagOptions...)
 			if err != nil {
 				return err
 			}
