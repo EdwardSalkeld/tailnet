@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"os"
 
 	"github.com/pulumi/pulumi-tailscale/sdk/go/tailscale"
@@ -58,15 +57,6 @@ type deviceConfig struct {
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
-		config, err := readTailnetConfig("tailnet.json")
-		if err != nil {
-			return err
-		}
-		devices, err := readDevicesConfig("devices.json")
-		if err != nil {
-			return err
-		}
-
 		policy, err := os.ReadFile("policy.hujson")
 		if err == nil {
 			_, err = tailscale.NewAcl(ctx, "policy", &tailscale.AclArgs{
@@ -80,15 +70,15 @@ func main() {
 			return err
 		}
 
-		if config.DNS != nil {
-			_, err = tailscale.NewDnsConfiguration(ctx, "dns", buildDNSArgs(config.DNS), pulumi.Protect(true))
+		if tailnet.DNS != nil {
+			_, err = tailscale.NewDnsConfiguration(ctx, "dns", buildDNSArgs(tailnet.DNS), pulumi.Protect(true))
 			if err != nil {
 				return err
 			}
 		}
 
-		if config.Settings != nil {
-			_, err = tailscale.NewTailnetSettings(ctx, "settings", buildTailnetSettingsArgs(config.Settings), pulumi.Protect(true))
+		if tailnet.Settings != nil {
+			_, err = tailscale.NewTailnetSettings(ctx, "settings", buildTailnetSettingsArgs(tailnet.Settings), pulumi.Protect(true))
 			if err != nil {
 				return err
 			}
@@ -132,8 +122,8 @@ func main() {
 
 		ctx.Export("managedResources", pulumi.Map{
 			"policy":               pulumi.Bool(policy != nil),
-			"dns":                  pulumi.Bool(config.DNS != nil),
-			"settings":             pulumi.Bool(config.Settings != nil),
+			"dns":                  pulumi.Bool(tailnet.DNS != nil),
+			"settings":             pulumi.Bool(tailnet.Settings != nil),
 			"deviceKeys":           pulumi.Int(len(devices)),
 			"deviceTags":           pulumi.Int(len(devices)),
 			"deviceSubnetRoutes":   pulumi.Int(countDeviceSubnetRoutes(devices)),
@@ -152,38 +142,6 @@ func countDeviceSubnetRoutes(devices []deviceConfig) int {
 		}
 	}
 	return count
-}
-
-func readDevicesConfig(path string) ([]deviceConfig, error) {
-	body, err := os.ReadFile(path)
-	if os.IsNotExist(err) {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	var devices []deviceConfig
-	if err := json.Unmarshal(body, &devices); err != nil {
-		return nil, err
-	}
-	return devices, nil
-}
-
-func readTailnetConfig(path string) (*tailnetConfig, error) {
-	body, err := os.ReadFile(path)
-	if os.IsNotExist(err) {
-		return &tailnetConfig{}, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	var config tailnetConfig
-	if err := json.Unmarshal(body, &config); err != nil {
-		return nil, err
-	}
-	return &config, nil
 }
 
 func buildDNSArgs(config *dnsConfig) *tailscale.DnsConfigurationArgs {
