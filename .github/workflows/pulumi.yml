@@ -1,0 +1,55 @@
+name: Pulumi
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  PULUMI_STACK: ${{ vars.PULUMI_STACK || 'main' }}
+  TAILSCALE_OAUTH_CLIENT_ID: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+  TAILSCALE_OAUTH_CLIENT_SECRET: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
+
+jobs:
+  preview:
+    name: Preview
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.8"
+          cache: true
+      - run: go test ./...
+      - uses: pulumi/actions@v7
+        with:
+          command: preview
+          stack-name: ${{ env.PULUMI_STACK }}
+          comment-on-pr: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+  up:
+    name: Apply
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.8"
+          cache: true
+      - run: go test ./...
+      - uses: pulumi/actions@v7
+        with:
+          command: up
+          stack-name: ${{ env.PULUMI_STACK }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

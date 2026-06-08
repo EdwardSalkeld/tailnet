@@ -1,0 +1,5 @@
+name: tailnet
+description: Tailscale tailnet managed with Pulumi
+runtime:
+  name: go
+main: .
