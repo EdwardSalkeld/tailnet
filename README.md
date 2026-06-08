@@ -29,7 +29,7 @@ OAuth is preferred over a long-lived API key. The Pulumi Tailscale provider also
 
 ## Import existing state
 
-Replace `policy.hujson` and `tailnet.json` with the current values from Tailscale before importing. The policy resource overwrites the whole Tailscale policy file, and `dns` manages the whole DNS configuration.
+Replace `policy.hujson` and the values in `config.go` with the current values from Tailscale before importing. The policy resource overwrites the whole Tailscale policy file, and `dns` manages the whole DNS configuration.
 
 Import the tailnet-wide resources:
 
@@ -37,6 +37,15 @@ Import the tailnet-wide resources:
 pulumi import tailscale:index/acl:Acl policy acl
 pulumi import tailscale:index/dnsConfiguration:DnsConfiguration dns dns_configuration
 pulumi import tailscale:index/tailnetSettings:TailnetSettings settings tailnet_settings
+```
+
+Import managed device resources using each device's node ID:
+
+```sh
+pulumi import tailscale:index/deviceKey:DeviceKey device-key-<name> <node-id>
+pulumi import tailscale:index/deviceTags:DeviceTags device-tags-<name> <node-id>
+pulumi import tailscale:index/deviceAuthorization:DeviceAuthorization device-authorization-<name> <node-id>
+pulumi import tailscale:index/deviceSubnetRoutes:DeviceSubnetRoutes device-routes-<name> <node-id>
 ```
 
 Then verify:
