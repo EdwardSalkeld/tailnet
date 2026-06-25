@@ -73,7 +73,7 @@ var devices = []deviceConfig{
 		DeviceID:          "nexsMcMda321CNTRL",
 		Hostname:          "fourth",
 		FQDN:              "fourth.tailb35748.ts.net",
-		Tags:              []string{"tag:server"},
+		Tags:              []string{"tag:server", "tag:ci-allowed"},
 		KeyExpiryDisabled: true,
 		Authorized:        true,
 	},
