@@ -24,6 +24,12 @@
 			"dst":    ["autogroup:self"],
 			"users":  ["autogroup:nonroot", "root"],
 		},
+		{
+			"action": "accept",
+			"src":    ["tag:personal"],
+			"dst":    ["tag:server"],
+			"users":  ["autogroup:nonroot", "root"],
+		},
 	],
 
 	"tagOwners": {
