@@ -27,7 +27,12 @@ jobs:
           go-version: "1.25.8"
           cache: true
       - run: go test ./...
+      - name: Skip preview when Pulumi credentials are unavailable
+        if: ${{ env.PULUMI_ACCESS_TOKEN == '' || env.TAILSCALE_OAUTH_CLIENT_ID == '' || env.TAILSCALE_OAUTH_CLIENT_SECRET == '' }}
+        run: |
+          echo "Skipping Pulumi preview because required secrets are unavailable in this workflow context."
       - uses: pulumi/actions@v7
+        if: ${{ env.PULUMI_ACCESS_TOKEN != '' && env.TAILSCALE_OAUTH_CLIENT_ID != '' && env.TAILSCALE_OAUTH_CLIENT_SECRET != '' }}
         with:
           command: preview
           stack-name: ${{ env.PULUMI_STACK }}
