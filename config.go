@@ -91,7 +91,7 @@ var devices = []deviceConfig{
 		DeviceID:          "nKBdngosQB21CNTRL",
 		Hostname:          "partridge",
 		FQDN:              "partridge.tailb35748.ts.net",
-		Tags:              []string{"tag:server", "tag:ci-allowed"},
+		Tags:              []string{"tag:server"},
 		KeyExpiryDisabled: true,
 		Authorized:        true,
 	},
