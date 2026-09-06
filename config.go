@@ -78,6 +78,15 @@ var devices = []deviceConfig{
 		Authorized:        true,
 	},
 	{
+		Name:              "magpie",
+		DeviceID:          "n49eMmw3F311CNTRL",
+		Hostname:          "magpie",
+		FQDN:              "magpie.tailb35748.ts.net",
+		Tags:              []string{"tag:server"},
+		KeyExpiryDisabled: true,
+		Authorized:        true,
+	},
+	{
 		Name:              "mba",
 		DeviceID:          "nk9XCktEzW11CNTRL",
 		Hostname:          "Edward's MacBook Air (2)",
