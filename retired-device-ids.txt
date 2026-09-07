@@ -1,0 +1,3 @@
+# Devices removed from the Tailnet after their Pulumi management resources are
+# destroyed. Entries remain here so the deletion step is idempotent.
+n28jZ9kBFw11CNTRL

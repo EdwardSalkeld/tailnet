@@ -53,3 +53,5 @@ jobs:
           stack-name: ${{ env.PULUMI_STACK }}
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      - name: Retire decommissioned devices
+        run: bash scripts/remove-retired-devices.sh
