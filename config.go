@@ -101,6 +101,10 @@ var devices = []deviceConfig{
 		Hostname:          "partridge",
 		FQDN:              "partridge.tailb35748.ts.net",
 		Tags:              []string{"tag:server"},
+		// The NixOS host advertises this less-specific prefix so clients already
+		// on 10.4.1.0/24 retain their direct LAN route. Policy below grants
+		// access only to the actual 10.4.1.0/24 LAN.
+		SubnetRoutes:      []string{"10.4.0.0/23"},
 		KeyExpiryDisabled: true,
 		Authorized:        true,
 	},
