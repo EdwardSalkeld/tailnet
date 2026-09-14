@@ -51,7 +51,7 @@ var devices = []deviceConfig{
 	},
 	{
 		Name:              "falcon",
-		DeviceID:          "nq5gdWQR7X11CNTRL",
+		DeviceID:          "nCGPKNNscf11CNTRL",
 		Hostname:          "falcon",
 		FQDN:              "falcon.tailb35748.ts.net",
 		Tags:              []string{"tag:server"},
