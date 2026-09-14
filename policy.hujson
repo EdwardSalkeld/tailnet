@@ -11,6 +11,13 @@
 			"ip":  ["*"],
 		},
 		{
+			// Partridge advertises 10.4.0.0/23 to preserve direct LAN routing
+			// for clients already on 10.4.1.0/24. Only expose the home LAN.
+			"src": ["tag:server"],
+			"dst": ["10.4.1.0/24"],
+			"ip":  ["*"],
+		},
+		{
 			"src": ["tag:ci"],
 			"dst": ["tag:ci-allowed"],
 			"ip":  ["*"],
