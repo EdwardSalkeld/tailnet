@@ -5,7 +5,17 @@ var tailnet = &tailnetConfig{
 		MagicDNS:    boolPtr(true),
 		Nameservers: []nameserverConfig{},
 		SearchPaths: []string{},
-		SplitDNS:    []splitDNSConfig{},
+		// The home resolver is reached through Partridge's approved subnet route.
+		// It serves the private int.alcachofa.faith zone, while public DNS remains
+		// responsible for every other name.
+		SplitDNS: []splitDNSConfig{
+			{
+				Domain: "int.alcachofa.faith",
+				Nameservers: []nameserverConfig{
+					{Address: "10.4.1.1"},
+				},
+			},
+		},
 	},
 	Settings: &tailnetSettingsConfig{
 		AclsExternallyManagedOn:               boolPtr(false),
@@ -96,11 +106,11 @@ var devices = []deviceConfig{
 		Authorized:        true,
 	},
 	{
-		Name:              "partridge",
-		DeviceID:          "nKBdngosQB21CNTRL",
-		Hostname:          "partridge",
-		FQDN:              "partridge.tailb35748.ts.net",
-		Tags:              []string{"tag:server"},
+		Name:     "partridge",
+		DeviceID: "nKBdngosQB21CNTRL",
+		Hostname: "partridge",
+		FQDN:     "partridge.tailb35748.ts.net",
+		Tags:     []string{"tag:server"},
 		// The NixOS host advertises this less-specific prefix so clients already
 		// on 10.4.1.0/24 retain their direct LAN route. Policy below grants
 		// access only to the actual 10.4.1.0/24 LAN.
