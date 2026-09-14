@@ -90,8 +90,12 @@ func main() {
 			// Device identities are intentionally replaceable: rebuilding a host
 			// gives it a new Tailscale device ID. Git review and the Pulumi preview
 			// protect these changes; resource protection would block the necessary
-			// replacement. Keep protection for tailnet-wide resources above.
-			var deviceTagOptions []pulumi.ResourceOption
+			// replacement. Each resource must therefore replace rather than attempt
+			// an in-place update when its backing device ID changes.
+			deviceOptions := []pulumi.ResourceOption{
+				pulumi.ReplaceOnChanges([]string{"deviceId"}),
+			}
+			deviceTagOptions := append([]pulumi.ResourceOption{}, deviceOptions...)
 			if policyResource != nil {
 				deviceTagOptions = append(deviceTagOptions, pulumi.DependsOn([]pulumi.Resource{policyResource}))
 			}
@@ -99,7 +103,7 @@ func main() {
 			_, err = tailscale.NewDeviceKey(ctx, "device-key-"+device.Name, &tailscale.DeviceKeyArgs{
 				DeviceId:          pulumi.String(device.DeviceID),
 				KeyExpiryDisabled: pulumi.Bool(device.KeyExpiryDisabled),
-			})
+			}, deviceOptions...)
 			if err != nil {
 				return err
 			}
@@ -116,7 +120,7 @@ func main() {
 				_, err = tailscale.NewDeviceSubnetRoutes(ctx, "device-routes-"+device.Name, &tailscale.DeviceSubnetRoutesArgs{
 					DeviceId: pulumi.String(device.DeviceID),
 					Routes:   toStringArray(device.SubnetRoutes),
-				})
+				}, deviceOptions...)
 				if err != nil {
 					return err
 				}
@@ -125,7 +129,7 @@ func main() {
 			_, err = tailscale.NewDeviceAuthorization(ctx, "device-authorization-"+device.Name, &tailscale.DeviceAuthorizationArgs{
 				DeviceId:   pulumi.String(device.DeviceID),
 				Authorized: pulumi.Bool(device.Authorized),
-			})
+			}, deviceOptions...)
 			if err != nil {
 				return err
 			}
