@@ -24,6 +24,10 @@ jobs:
     # PR. The default single-slot queue coalesces to the newest commit: a
     # superseded preview is dropped while still pending rather than cancelled
     # mid-run, which keeps us clear of the stack lock either way.
+    #
+    # Both groups below spell out the stack rather than reusing env.PULUMI_STACK:
+    # concurrency cannot read the env context, so an env reference resolves to
+    # the empty string and quietly collapses every stack into one group.
     concurrency:
       group: pulumi-preview-${{ vars.PULUMI_STACK || 'main' }}-${{ github.ref }}
       cancel-in-progress: false
