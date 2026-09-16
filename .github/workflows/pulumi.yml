@@ -20,6 +20,17 @@ jobs:
     name: Preview
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    # Previews are keyed per PR so they never queue behind an apply or another
+    # PR. The default single-slot queue coalesces to the newest commit: a
+    # superseded preview is dropped while still pending rather than cancelled
+    # mid-run, which keeps us clear of the stack lock either way.
+    #
+    # Both groups below spell out the stack rather than reusing env.PULUMI_STACK:
+    # concurrency cannot read the env context, so an env reference resolves to
+    # the empty string and quietly collapses every stack into one group.
+    concurrency:
+      group: pulumi-preview-${{ vars.PULUMI_STACK || 'main' }}-${{ github.ref }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v5
@@ -40,6 +51,14 @@ jobs:
     name: Apply
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    # Serialise applies: two merges close together otherwise race for the stack
+    # lock and the loser dies on a 409. queue: max is required because the
+    # default holds only one pending run and cancels it when the next arrives,
+    # which would silently drop a merge's infra change.
+    concurrency:
+      group: pulumi-up-${{ vars.PULUMI_STACK || 'main' }}
+      cancel-in-progress: false
+      queue: max
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v5
