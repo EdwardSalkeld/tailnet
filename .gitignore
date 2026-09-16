@@ -4,3 +4,7 @@ dist/
 .env
 *.local
 auths
+
+# `go build` drops the compiled program at the repo root, named after the
+# module. Anchored so it can never shadow a future directory of the same name.
+/tailnet
