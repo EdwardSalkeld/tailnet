@@ -18,6 +18,14 @@
 			"ip":  ["*"],
 		},
 		{
+			// Exit node use is not covered by the "*" destination above; it has
+			// to name autogroup:internet. Applies to Partridge (home) and
+			// Falcon (Hetzner) alike.
+			"src": ["tag:personal"],
+			"dst": ["autogroup:internet"],
+			"ip":  ["*"],
+		},
+		{
 			"src": ["tag:ci"],
 			"dst": ["tag:ci-allowed"],
 			"ip":  ["*"],
