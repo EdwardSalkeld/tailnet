@@ -8,11 +8,15 @@ var tailnet = &tailnetConfig{
 		// The home resolver is reached through Partridge's approved subnet route.
 		// It serves the private int.alcachofa.faith zone, while public DNS remains
 		// responsible for every other name.
+		//
+		// UseWithExitNode keeps this resolver in play while an exit node is
+		// selected. Without it a client on an exit node sends every query to
+		// that node's resolver, and the int zone stops resolving away from home.
 		SplitDNS: []splitDNSConfig{
 			{
 				Domain: "int.alcachofa.faith",
 				Nameservers: []nameserverConfig{
-					{Address: "10.4.1.1"},
+					{Address: "10.4.1.1", UseWithExitNode: boolPtr(true)},
 				},
 			},
 		},
@@ -111,10 +115,14 @@ var devices = []deviceConfig{
 		Hostname: "partridge",
 		FQDN:     "partridge.tailb35748.ts.net",
 		Tags:     []string{"tag:server"},
-		// The NixOS host advertises this less-specific prefix so clients already
-		// on 10.4.1.0/24 retain their direct LAN route. Policy below grants
-		// access only to the actual 10.4.1.0/24 LAN.
-		SubnetRoutes:      []string{"10.4.0.0/23"},
+		// The NixOS host advertises the less-specific 10.4.0.0/23 so clients
+		// already on 10.4.1.0/24 retain their direct LAN route. Policy below
+		// grants access only to the actual 10.4.1.0/24 LAN.
+		//
+		// 0.0.0.0/0 and ::/0 approve Partridge as an exit node. Home has no
+		// IPv6 upstream, so v6 destinations fall back to v4 rather than
+		// leaking out of the client's local interface.
+		SubnetRoutes:      []string{"10.4.0.0/23", "0.0.0.0/0", "::/0"},
 		KeyExpiryDisabled: true,
 		Authorized:        true,
 	},
