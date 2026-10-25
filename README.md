@@ -57,7 +57,21 @@ pulumi preview
 
 ## GitHub Actions
 
-The workflow previews Pulumi changes on pull requests and applies them on pushes to `main`.
+The workflow checks gofmt and runs Go tests before previewing Pulumi changes on
+pull requests or applying them on pushes to `main`.
+
+Format Go source locally:
+
+```sh
+gofmt -w .
+```
+
+Run the same formatting check as CI (prints a diff and fails if formatting is needed):
+
+```sh
+gofmt -d .
+test -z "$(gofmt -l .)"
+```
 
 Repository secrets:
 
